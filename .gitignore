@@ -1,0 +1,7 @@
+wandb/
+__pycache__/
+
+caltech101/
+*.tar.gz
+clip-caltech101/
+*.ckpt
