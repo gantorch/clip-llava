@@ -8,8 +8,8 @@ from torch.utils.data import random_split, DataLoader
 import torchvision.transforms as T
 import wandb
 
-# ✅ Import LLaVA Model and Processor
-from transformers import AutoModelForVision2Seq, AutoProcessor
+# ✅ Import Correct LLaVA Model & Processor
+from transformers import LlavaForConditionalGeneration, LlavaProcessor
 
 class Caltech101DataModule(pl.LightningDataModule):
     def __init__(self, data_dir: str, batch_size=32, num_workers=0):
@@ -62,22 +62,22 @@ class LLAVAClassifier(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
 
-        # ✅ Use the correct LLaVA model name
-        model_name = "liuhaotian/llava-v1.5-7b"
+        # ✅ Use the correct LLaVA model
+        model_name = "liuhaotian/llava-13b-v1.5"
 
-        # ✅ Load LLaVA with `offload_folder`
-        self.llava_model = AutoModelForVision2Seq.from_pretrained(
+        # ✅ Use `LlavaForConditionalGeneration` instead of AutoModelForVision2Seq
+        self.llava_model = LlavaForConditionalGeneration.from_pretrained(
             model_name,
-            torch_dtype=torch.float16,  # Use FP16 for efficiency
-            device_map="auto",          # Auto GPU placement
-            offload_folder="./offload",  # 🔥 Fix offload error
+            torch_dtype=torch.float16,
+            device_map="auto",
+            offload_folder="./offload",  # Fix memory issues
             trust_remote_code=True
         )
 
-        # ✅ Load processor to correctly handle images
-        self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
+        # ✅ Use `LlavaProcessor`
+        self.processor = LlavaProcessor.from_pretrained(model_name)
 
-        # Freeze LLaVA model parameters (only train classifier)
+        # Freeze all LLaVA parameters (only train classifier)
         for param in self.llava_model.parameters():
             param.requires_grad = False
 
