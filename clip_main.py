@@ -17,7 +17,7 @@ class Caltech101DataModule(pl.LightningDataModule):
         self.num_workers = num_workers
 
         self.transform = T.Compose([
-            T.Lambda(lambda img: img.convert("RGB")),  # ✅ Convert grayscale to RGB
+            T.Lambda(lambda img: img.convert("RGB")),
             T.Resize((224, 224), interpolation=T.InterpolationMode.BICUBIC),
             T.ToTensor(),
             T.Normalize(
@@ -92,7 +92,7 @@ class CLIPClassifier(pl.LightningModule):
 
 
 def main():
-    wandb_logger = WandbLogger(project="clip-caltech101")
+    wandb_logger = WandbLogger(project="clip-llava-caltech101")
 
     data_module = Caltech101DataModule(data_dir="./caltech101", batch_size=16, num_workers=0)
 
